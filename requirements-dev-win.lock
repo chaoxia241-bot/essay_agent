@@ -1,0 +1,39 @@
+# P1 core/dev lock for Windows and Python 3.12.
+# Parsing, retrieval, graph, LLM, and local-model extras are locked separately
+# when their implementation stages begin.
+annotated-doc==0.0.5
+annotated-types==0.8.0
+anyio==4.15.0
+certifi==2026.7.22
+colorama==0.4.6
+greenlet==3.5.5
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.19
+iniconfig==2.3.0
+librt==0.15.0
+loguru==0.7.3
+markdown-it-py==4.2.0
+mdurl==0.1.2
+mypy==1.20.2
+mypy_extensions==1.1.0
+packaging==26.3
+pathspec==1.1.1
+pluggy==1.6.0
+pydantic==2.13.5
+pydantic-settings==2.15.0
+pydantic_core==2.46.5
+Pygments==2.21.0
+pytest==8.4.2
+python-dotenv==1.2.3
+PyYAML==6.0.3
+rich==15.0.0
+ruff==0.16.6
+shellingham==1.5.4
+SQLAlchemy==2.0.52
+typer==0.27.2
+types-PyYAML==6.0.12.20260815
+typing-inspection==0.4.4
+typing_extensions==4.16.0
+win32_setctime==1.2.0

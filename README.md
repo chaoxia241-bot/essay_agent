@@ -128,14 +128,15 @@ Essay_Analysis_Agent/
 
 **P1.1 环境就绪**
 
-- [ ] 锁依赖版本并安装（core + parsing + retrieval + graph + llm + local-models）
+- [x] Python 3.12 核心开发环境、环境检查脚本与 Windows 锁文件
+- [~] parsing + retrieval + graph + llm + local-models 依赖（按对应节点安装）
 - [ ] `docker compose up -d` 起 Qdrant + Neo4j，验证连通性
 - [ ] 核对 LongCat `/v1/models` 模型 ID，实测 `json_object` 结构化输出
 - [ ] bge-m3 CPU 档加载验证，记录单条 encode 耗时
 
 **P1.2 解析与领域模型**
 
-- [ ] Pydantic 领域模型：`Paper` / `Evidence` / `Claim`（`Result`、`Condition` 同步定义，P2 启用）
+- [x] Pydantic 领域模型：`Paper` / `Section` / `Chunk` / `Evidence` / `Claim` / `Result` / `Condition` / 抽取与审核记录
 - [ ] MinerU 解析 10 篇种子论文（GPU 机执行），产出 md + json + bbox，同步回开发机
 - [ ] 分块：section 优先，表格整体不切，chunk 头附 title/section 路径
 

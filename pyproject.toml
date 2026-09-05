@@ -2,16 +2,15 @@
 name = "litagent"
 version = "0.1.0"
 description = "Evidence-grounded literature research agent"
-requires-python = ">=3.11"
-# 版本号待 P0 锁定；当前只声明分组，未安装
+requires-python = ">=3.11,<3.13"
 dependencies = [
-    "pydantic>=2.7",
-    "pydantic-settings>=2.3",
-    "pyyaml>=6.0",
-    "loguru>=0.7",
-    "typer>=0.12",
-    "sqlalchemy>=2.0",
-    "httpx>=0.27",
+    "pydantic>=2.12,<3",
+    "pydantic-settings>=2.11,<3",
+    "pyyaml>=6.0,<7",
+    "loguru>=0.7,<1",
+    "typer>=0.20,<1",
+    "sqlalchemy>=2.0.43,<3",
+    "httpx>=0.28,<1",
 ]
 
 [project.optional-dependencies]
@@ -32,7 +31,15 @@ ui-chainlit = ["chainlit>=2.9"]   # 备选：v2.x 起 UI 用 React 重写
 ui-nicegui = ["nicegui>=1.4"]     # 备选：纯 Python 后台
 # 编排（D4 延后至 P5 决定；P1-P4 仅按接口预留，不装）
 orchestration = ["langgraph>=0.2", "langchain-core>=0.3"]
-dev = ["pytest>=8.0", "ruff>=0.6", "mypy>=1.11"]
+dev = [
+    "pytest>=8.4,<9",
+    "ruff>=0.14,<1",
+    "mypy>=1.18,<2",
+    "types-PyYAML>=6.0,<7",
+]
+
+[project.scripts]
+litagent-env-check = "litagent.core.environment:main"
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -43,6 +50,7 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-q"
 
 [tool.ruff]
 line-length = 100

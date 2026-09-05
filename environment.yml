@@ -1,0 +1,8 @@
+name: litagent
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip>=25
+  - pip:
+      - -e .[dev]
