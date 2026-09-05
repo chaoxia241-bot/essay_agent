@@ -1,0 +1,41 @@
+# 应用级配置
+app:
+  name: litagent
+  env: dev
+  log_level: INFO
+
+paths:
+  raw_pdfs: data/raw_pdfs        # 原始 PDF，只读
+  parsed: data/parsed            # MinerU 解析产物
+  assets: data/assets            # 图片 / 表格 HTML 等大对象
+  index: data/index              # BM25s 落盘索引
+  eval: data/eval                # 离线评测集
+
+storage:
+  relational:
+    driver: sqlite               # sqlite | postgres（ADR-005）
+    dsn: sqlite:///data/litagent.db
+  vector:
+    driver: qdrant               # ADR-002
+    url: http://localhost:6333
+    api_key: null
+    collection: paper_chunks
+    vector_size: 1024            # 与 Embedding 模型维度一致，待 D5b 确认
+    distance: Cosine
+  lexical:
+    driver: bm25s                # ADR-002
+    index_dir: data/index/bm25
+    # 新增论文走增量追加，词表增长超过该比例时全量重建
+    rebuild_vocab_growth_ratio: 0.3
+  graph:
+    driver: neo4j                # ADR-003
+    uri: bolt://localhost:7687
+    user: neo4j
+    password_env: NEO4J_PASSWORD
+  object:
+    driver: local                # ADR-D7 默认本地文件系统
+    base_dir: data/assets
+
+api:
+  host: 0.0.0.0
+  port: 8000

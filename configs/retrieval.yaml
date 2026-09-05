@@ -1,0 +1,51 @@
+# 检索 / 融合 / 重排（ADR-002：Qdrant + BM25s；ADR-006：跨语言）
+dense:
+  driver: qdrant
+  top_k: 50
+  score_threshold: null
+  filters: {}                    # year / venue / dataset / paper_id 等 payload 过滤
+
+bm25:
+  driver: bm25s
+  top_k: 50
+  k1: 1.2
+  b: 0.75
+  # 中文 query 必须先经 query_rewrite 转英文检索式才进 BM25（跨语言硬约束）
+  query_language: en
+
+# bge-m3 自带 sparse lexical weights，作为 BM25 之外的第三条稀疏路
+# 相比 BM25 具备跨语言能力，是对冲跨语言召回损失的关键手段
+bge_sparse:
+  enabled: true
+  top_k: 50
+  weight: 0.7                    # 融合时相对 BM25 的权重
+
+kg:
+  enabled: false                 # P3 起启用
+  driver: neo4j
+  max_hops: 2
+  top_k: 30
+  min_relation_confidence: 0.8
+
+fusion:
+  method: rrf                    # rrf | weighted
+  rrf_k: 60
+  # 参与融合的路：dense(en/zh) + bm25(en) + bge_sparse + kg
+  lanes: [dense, bm25, bge_sparse]
+
+rerank:
+  enabled: true
+  driver: flag-embedding
+  top_k: 10
+  query_language: en
+
+evidence_filter:
+  min_score: null
+  require_citation_anchor: true  # 每条证据必须能定位到 page/section/table/figure
+  dedup_by: paper_id
+
+# 三档路由（P4）
+router:
+  mode: heuristic_first          # heuristic_first | llm | hybrid
+  deep_research_keywords: ["演化", "趋势", "综述", "对比", "争议", "共识", "survey", "trend", "compare"]
+  kg_keywords: ["哪些", "比较了", "在...基础上", "基于", "extends", "compared", "evaluated on"]

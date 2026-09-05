@@ -1,0 +1,79 @@
+# 模型配置
+# LLM：LongCat API  |  Embedding/Reranker：本地 BGE（ADR-007）
+# 环境：dev=无 GPU 公司机（跑流程验证），deploy=8GB 4060 笔记本（ADR-010）
+
+# 通过 LITAGENT_PROFILE 切换：dev_cpu | gpu_8g
+default_profile: dev_cpu
+
+profiles:
+  dev_cpu:
+    device: cpu
+    fp16: false
+    embedding_batch_size: 8
+    rerank_enabled: false        # 开发期先关，验证召回后再开
+    rerank_top_k: 20
+    mineru_device: cpu
+  gpu_8g:
+    device: cuda
+    fp16: true
+    embedding_batch_size: 32
+    rerank_enabled: true
+    rerank_top_k: 50
+    mineru_device: cuda
+
+llm:
+  default: extraction
+  driver: openai_compatible
+  base_url: https://api.longcat.chat/openai/v1   # LongCat 统一生产端点
+  api_key_env: LONGCAT_API_KEY
+  # LongCat 平台仅提供 chat/completions，无 embeddings 端点，故向量化一律本地
+  providers:
+    extraction:
+      model: LongCat-2.0        # 以 GET /v1/models 返回为准，起服前核对
+      temperature: 0.0
+      max_tokens: 8192
+      structured_output: json_object   # 需实测；不支持则降级为 function_calling + 修复重试
+    synthesis:
+      model: LongCat-2.0
+      temperature: 0.2
+    planner:
+      model: LongCat-2.0
+      temperature: 0.0
+    # 跨语言检索专用：中文 query -> 英文检索式（ADR-008）
+    query_rewrite:
+      model: LongCat-2.0
+      temperature: 0.0
+      max_tokens: 512
+
+embedding:
+  driver: flag-embedding
+  model: BAAI/bge-m3
+  dimension: 1024               # 固定值，换模型必须重建 Qdrant collection
+  max_length: 8192
+  # 开发与部署必须用同一模型：CPU / GPU 仅影响速度，向量空间一致，索引可跨环境复用
+  emit_sparse: true             # bge-m3 自带 lexical weights，用于跨语言稀疏召回
+
+reranker:
+  driver: flag-embedding
+  model: BAAI/bge-reranker-v2-m3
+  # 跨语言 rerank：中文 query + 英文 doc 可用；默认用英文检索式 rerank
+  query_language: en
+
+# 中文 query / 英文语料的跨语言策略（ADR-008）
+cross_lingual:
+  enabled: true
+  dense_query: zh               # 中文 query 直接走多语言 dense
+  sparse_query: en              # BM25 必须用英文检索式，否则跨语言完全失效
+  protect_terms: [LoRA, QLoRA, PEFT, ImageNet, GLUE]  # 术语不翻译，由词表持续补充
+  fallback_translation: true
+
+telemetry:
+  record_prompt_version: true
+  record_token_usage: true
+  trace_dir: data/traces
+
+budget:
+  max_tokens_per_research: 200000
+  max_sub_questions: 5
+  max_evidence_per_question: 10
+  max_rerank_candidates: 50

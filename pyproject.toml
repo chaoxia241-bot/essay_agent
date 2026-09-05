@@ -1,0 +1,49 @@
+[project]
+name = "litagent"
+version = "0.1.0"
+description = "Evidence-grounded literature research agent"
+requires-python = ">=3.11"
+# 版本号待 P0 锁定；当前只声明分组，未安装
+dependencies = [
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "pyyaml>=6.0",
+    "loguru>=0.7",
+    "typer>=0.12",
+    "sqlalchemy>=2.0",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+# PDF 解析（ADR-001）
+parsing = ["magic-pdf[full]>=1.0"]
+# 检索（ADR-002）
+retrieval = ["qdrant-client>=1.11", "bm25s>=0.2", "PyStemmer>=2.2"]
+# 图存储（ADR-003）
+graph = ["neo4j>=5.20"]
+# 模型（ADR-004：统一 OpenAI 兼容协议）
+llm = ["openai>=1.40"]
+# 本地 Embedding/Reranker（ADR-007，P1 必需）
+local-models = ["FlagEmbedding>=1.2", "torch>=2.3"]
+# 服务化（ADR-009：FastAPI + Vue3）
+serving = ["fastapi>=0.115", "uvicorn>=0.30", "sse-starlette>=2.1", "python-multipart>=0.0.9"]
+# 前端（D6 已定稿为自建，Chainlit/NiceGUI 仅作备选保留）
+ui-chainlit = ["chainlit>=2.9"]   # 备选：v2.x 起 UI 用 React 重写
+ui-nicegui = ["nicegui>=1.4"]     # 备选：纯 Python 后台
+# 编排（D4 延后至 P5 决定；P1-P4 仅按接口预留，不装）
+orchestration = ["langgraph>=0.2", "langchain-core>=0.3"]
+dev = ["pytest>=8.0", "ruff>=0.6", "mypy>=1.11"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

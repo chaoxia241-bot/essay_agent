@@ -1,0 +1,63 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Python / tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+build/
+dist/
+*.egg-info/
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local databases, services, indexes, logs and traces
+*.db
+*.sqlite
+*.sqlite3
+data/**/*.db
+data/**/*.sqlite*
+data/raw_pdfs/*
+data/parsed/*
+data/assets/*
+data/index/*
+data/traces/*
+data/eval/generated/*
+qdrant_storage/
+neo4j_data/
+neo4j_logs/
+*.log
+
+# Model downloads and local caches
+.cache/
+cache/
+models/
+hf_cache/
+transformers_cache/
+
+# Historical reference assets are kept locally, but are not part of the public repo.
+# They contain large raw data, generated outputs and previously exposed credentials.
+/数据处理/
+
+# Keep directory placeholders where useful
+!data/raw_pdfs/.gitkeep
+!data/parsed/.gitkeep
+!data/assets/.gitkeep
+!data/index/.gitkeep

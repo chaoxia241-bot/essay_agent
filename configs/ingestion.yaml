@@ -1,0 +1,42 @@
+# 论文入库 Pipeline（ADR-001：MinerU）
+parser:
+  driver: mineru                 # mineru（magic-pdf）
+  output_format: [markdown, json]  # JSON 提供 page/bbox/span 定位信息
+  extract_tables: true
+  extract_figures: true
+  extract_formulas: false        # 关闭：公式识别显存/时间开销大，8GB 环境不划算
+  ocr: auto                      # auto | always | never
+  keep_original_pdf: true        # 原始 PDF 只读，绝不覆盖
+  # ADR-010：解析是离线批处理，建议在 GPU 机解析后把 data/parsed 同步到无 GPU 开发机
+  # parsed 产物为 JSON/Markdown，体积小，跨机迁移成本远低于在无 GPU 环境硬跑
+  device_from_profile: true      # device 取 models.yaml 中当前 profile 的 mineru_device
+  backend: pipeline              # pipeline 显存可控；VLM 后端更准但 8GB 吃紧
+
+chunking:
+  strategy: section_first        # 先按章节切，超长再按长度兜底
+  max_tokens: 512
+  overlap: 64
+  keep_table_intact: true        # 表格整体作为一个 chunk，不被切断
+  attach_context_header: true    # chunk 头附加 paper title + section path
+
+extraction:
+  targets: [metadata, methods, datasets, tasks, metrics, results, claims, evidence]
+  require_span: true             # 证据必须带 page/section/char_span
+  prompt_version: v1             # 与 telemetry 联动，便于重抽对比
+  min_confidence_for_auto_approve: 0.8
+
+validation:
+  schema_check: true
+  entity_normalization: true     # 别名归一，低分进审核队列
+  span_backcheck: true           # char_span 回查原文，不命中则降置信
+  relation_requires_evidence: true
+
+review:
+  enabled: true
+  confidence_threshold: 0.8      # 低于阈值进人工审核，不直接入 KG
+  queue_driver: relational
+
+indexing:
+  dense: true
+  bm25: true
+  kg: true                       # 仅 approved 对象入图
