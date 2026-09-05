@@ -31,7 +31,7 @@
 
 提交：源代码、配置模板、Prompt、数据库迁移、测试、评测规范、小型脱敏 fixture、设计文档。
 
-不提交：原始 PDF、解析后的大文件、向量/倒排索引、SQLite/Neo4j 数据目录、模型缓存、完整医疗参考数据、任何 API Key。
+不提交：`papers/` 中的原始 PDF、解析后的大文件、向量/倒排索引、SQLite/Neo4j 数据目录、模型缓存、完整医疗参考数据、任何 API Key。
 
 `数据处理/` 仅作为本地参考资产，借鉴其中的抽取 Prompt、溯源关系和评测思路；不作为新系统代码直接导入。
 
@@ -49,15 +49,22 @@
 
 ### 阶段 1：Evidence Layer 最小闭环
 
-顺序固定为：
+离线数据准备顺序：
 
 1. `Paper / Chunk / Evidence / Claim / Result / Condition` 模型
 2. SQLite 元数据与溯源表
 3. MinerU 适配器和 section-first chunker
 4. span/page/section 回查校验
-5. Dense + BM25s + RRF 检索
-6. CLI 问答与 `[论文, 页码, 章节]` 引用
-7. 30 条中文问题的 Recall@K、引用正确率评测
+5. Dense / BM25s / BGE Sparse 索引构建
+
+查询时执行顺序：
+
+1. Query Rewrite（保留原 query，并生成 BM25 英文检索式）
+2. Dense / BM25s / BGE Sparse 多路召回
+3. RRF 融合
+4. GPU 环境可选 Reranker
+5. CLI 问答与 `[论文, 页码, 章节]` 引用
+6. 30 条中文问题的 Recall@K、引用正确率评测
 
 出口：10 篇种子论文可以入库，事实型问题能回到原文证据。
 

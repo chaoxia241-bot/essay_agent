@@ -5,7 +5,7 @@ app:
   log_level: INFO
 
 paths:
-  raw_pdfs: data/raw_pdfs        # 原始 PDF，只读
+  raw_pdfs: papers                # 原始 PDF，只读；目录内容不进入 Git
   parsed: data/parsed            # MinerU 解析产物
   assets: data/assets            # 图片 / 表格 HTML 等大对象
   index: data/index              # BM25s 落盘索引

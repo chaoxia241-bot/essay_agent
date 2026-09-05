@@ -34,6 +34,9 @@ Thumbs.db
 *.sqlite3
 data/**/*.db
 data/**/*.sqlite*
+# Canonical raw-paper directory. Keep only its placeholder in Git.
+/papers/*
+!/papers/.gitkeep
 data/raw_pdfs/*
 data/parsed/*
 data/assets/*
